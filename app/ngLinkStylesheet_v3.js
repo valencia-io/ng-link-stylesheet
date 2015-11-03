@@ -23,7 +23,7 @@
           if (_allowLink && !attr.hasOwnProperty('ngLinkStylesheetNoDestroy')) {
             return function(scope) {
               scope.$on('$destroy', function() {
-                document.getElementsByClassName(_class)[0].remove();
+                document.getElementsByClassName(_class).remove();
               });
             }
           }
