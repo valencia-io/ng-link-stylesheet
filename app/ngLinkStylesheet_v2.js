@@ -1,3 +1,7 @@
+/*
+*  This version use the compile function which is more fast, but it is only being executed one for scope.
+*  Which means than is the directive ng-link-stylesheet is used within a ng-repeat directive it will be executed only once.
+*/
 (function() {
   'use strict';
   angular
@@ -5,37 +9,29 @@
     .directive('ngLinkStylesheet', function() {
       return {
         restrict: 'A',
-        //compile function is being executed once for scope (no matter if the directed is called twice or more)
         compile: function(element, attr) {
+          var _class = 'ngLinkStylesheet-' + attr.ngLinkStylesheet;
+          var $head;
+          // not in use now
+          //var _id = 'ngLinkStylesheet-' + Date().now();
 
+          //insert link if it's the first one or if allow-duplicates is an attribute
+          var _allowLink = attr.hasOwnProperty('ngLinkStylesheetAllowDuplicates') || document.getElementsByClassName(_class).length < 1;
+          if (_allowLink) {
+            $head = angular.element(document).find('head');
+            $head.append('<link class="' + _class + '" rel="stylesheet" href="' + attr.ngLinkStylesheet + '" type="text/css" media="screen">');
 
-          return function(scope) {
-            //link function is being executed every time the directive is called
-            var linkClass = 'ngLinkStylesheet-' + attr.ngLinkStylesheet;
-            var $head;
+          }
 
-            //insert link if it's the first one or if allow-duplicates is an attribute
-            var insertLink = attr.hasOwnProperty('ngLinkStylesheetAllowDuplicates') || document.getElementsByClassName(linkClass).length < 1;
-
-            if (insertLink) {
-              $head = angular.element(document).find('head');
-              var linkId = 'ngLinkStylesheet-' + Date.now();
-              var link = '<link id="' + linkId + '" class="' + linkClass + '" rel="stylesheet" href="' + attr.ngLinkStylesheet + '" type="text/css" media="screen">';
-              $head.append(link);
-              // remove link when the scope is detroyed if not has no-destroy attribute
-              if (!attr.hasOwnProperty('ngLinkStylesheetNoDestroy')) {
-                scope.$on('$destroy', function() {
-                  console.log(linkId, ' linkId removed');
-                  document.getElementById(linkId).remove();
-                  // console.log(linkClass);
-                  // console.log(angular.element(document).find('head').find('.' + linkClass));
-                  // angular.element(document).find('head').find('.' + linkClass).remove();
-
-                });
-              }
-
+          // destroy link if it was created but not destroy it if no-destroy is an attribute
+          if (_allowLink && !attr.hasOwnProperty('ngLinkStylesheetNoDestroy')) {
+            return function(scope) {
+              scope.$on('$destroy', function() {
+                document.getElementsByClassName(_class)[0].remove();
+              });
             }
-          };
+          }
+
         },
       };
     });
