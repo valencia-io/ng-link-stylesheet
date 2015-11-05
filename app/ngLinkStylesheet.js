@@ -11,7 +11,9 @@
             return {
                 restrict: 'A',
                 link: function(scope, element, attr) {
-                    console.time('insert-link');
+                    if (!attr.ngLinkStylesheet || attr.ngLinkStylesheet.toLowerCase() === 'auto') {
+                        attr.ngLinkStylesheet = attr.class.split(' ')[0] + '.css';
+                    }
                     var linkClass = 'ngLinkStylesheet-' + attr.ngLinkStylesheet;
                     var linkId = 'ngLinkStylesheet-' + Date.now();
                     var rel = attr.rel || 'stylesheet';
@@ -33,15 +35,12 @@
                     // destroy link if not has no-destroy attribute
                     if (insertLink && !attr.hasOwnProperty('ngLinkStylesheetNoDestroy')) {
                         scope.$on('$destroy', function() {
-                            console.time('remove-link');
                             var element = document.getElementById(linkId);
                             if (element) {
                                 element.remove();
                             }
-                            console.timeEnd('remove-link');
                         });
                     }
-                    console.timeEnd('insert-link');
 
                 },
             };

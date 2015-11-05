@@ -20,14 +20,23 @@
             color: white;
             min-height: 100px;
         }
+        head::before {
+            position:relative;
+            left: -20px;
+            content: "<head>"
+        }
+        head::after {
+            position:relative;
+            left: -20px;
+            content: "</head>"
+        }
 
-        link[href][rel] {
+        link {
             display: block;
         }
 
-        link[href][rel]::after {
+        link::after {
             content: '<link href="'  attr(href) '" rel="' attr(rel) '" media="' attr(media) '" type="' attr(type) '" >';
-            /*<link id="ngLinkStylesheet-1446760625394" class="ngLinkStylesheet-style3.css" rel="stylesheet" href="style3.css" type="text/css" media="all">*/
         }
 
     </style>
