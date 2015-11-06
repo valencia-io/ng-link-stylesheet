@@ -1,17 +1,13 @@
-// PRINTING THE HEAD TAG TO WATCH THE DIFERENCES
+// working in the link function
 (function() {
     'use strict';
     angular
         .module('ngLinkStylesheet', [])
         .directive('ngLinkStylesheet', function() {
-            function printHead() {
-                var headHTML = angular.element(document).find('head').html();
-                angular.element(document).find('code').text(headHTML);
-                prettyPrint();
-            }
             return {
                 restrict: 'A',
                 link: function(scope, element, attr) {
+                    console.time('ng-link');
                     var linkClass = 'ngLinkStylesheet-' + attr.ngLinkStylesheet;
                     var linkId = 'ngLinkStylesheet-' + Date.now();
                     var rel = attr.rel || 'stylesheet';
@@ -29,7 +25,6 @@
                     if (insertLink) {
                         $head = angular.element(document).find('head');
                         $head.append(linkTemplate);
-                        printHead()
                     }
                     // destroy link if not has no-destroy attribute
                     if (insertLink && !attr.hasOwnProperty('ngLinkStylesheetNoDestroy')) {
@@ -37,11 +32,10 @@
                             var element = document.getElementById(linkId);
                             if (element) {
                                 element.remove();
-                                printHead()
                             }
                         });
                     }
-
+                    console.timeEnd('ng-link');
                 },
             };
         });

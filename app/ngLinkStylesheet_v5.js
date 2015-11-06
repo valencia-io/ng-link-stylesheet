@@ -1,17 +1,28 @@
+/**
+ **  PERFORMACE TEST
+ **  Conclusion:
+ **  The faster way is to have all the logic in the compile function,
+ **  which is called only once when the scope is created,
+ **  no matter how many times ng-link-stylesheet directive has been invoked.
+ **  But to create the event listener to destroy the link we need to acces the scope through
+ **  the link function (the return of the compile fn), which is called more than once. but we only
+ **/
+
 (function() {
     'use strict';
     angular
         .module('ngLinkStylesheet', [])
-        .value('baseUrl', '')
-        .directive('ngLinkStylesheet', ['baseUrl', function(baseUrl) {
+        .directive('ngLinkStylesheet', function() {
             // executed only once when the directive is declareted
             var head = document.getElementsByTagName('head')[0];
             var links = {}; // status of the links added to head
             function compile(element, attr) {
-
-                
-                var linkClass = 'ngLinkStylesheet-' + attr.ngLinkStylesheet;
                 var linkId = 'ngLinkStylesheet-' + Date.now();
+                console.time('add ' + linkId);
+                if (!attr.ngLinkStylesheet || attr.ngLinkStylesheet.toLowerCase() === 'auto') {
+                    attr.ngLinkStylesheet = attr.class.split(' ')[0] + '.css';
+                }
+                var linkClass = 'ngLinkStylesheet-' + attr.ngLinkStylesheet;
 
                 var linkTemplate = document.createElement("link");
                 linkTemplate.setAttribute("id", linkId);
@@ -27,6 +38,7 @@
                     links[linkClass] = {added : true};
                 }
 
+                console.timeEnd('add ' + linkId);
                 // return directive link function to access the $scope
                 return function($scope) {
 
@@ -37,19 +49,27 @@
                         && !links[linkClass].onDestoy
                         && !attr.hasOwnProperty('ngLinkStylesheetNoDestroy')) {
 
+                        console.log('on detroy added');
+                        console.count(linkId);
                         links[linkClass].onDestoy = true;
                         $scope.$on('$destroy', function() {
+                            console.time('remove ' + linkId);
                             var element = document.getElementById(linkId);
                             if (element) {
                                 element.remove();
                             }
+                            console.timeEnd('remove ' + linkId);
                         });
+                        console.log(links);
+
                     }
+
+
                 };
             };
             return {
                 restrict: 'A',
                 compile: compile,
             };
-        }]);
+        });
 }());
