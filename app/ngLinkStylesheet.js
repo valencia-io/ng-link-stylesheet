@@ -2,14 +2,13 @@
     'use strict';
     angular
         .module('ngLinkStylesheet', [])
-        .value('baseUrl', '')
-        .directive('ngLinkStylesheet', ['baseUrl', function(baseUrl) {
+        .directive('ngLinkStylesheet', [ function(baseUrl) {
             // executed only once when the directive is declareted
             var head = document.getElementsByTagName('head')[0];
             var links = {}; // status of the links added to head
             function compile(element, attr) {
 
-                
+
                 var linkClass = 'ngLinkStylesheet-' + attr.ngLinkStylesheet;
                 var linkId = 'ngLinkStylesheet-' + Date.now();
 
@@ -50,6 +49,7 @@
             return {
                 restrict: 'A',
                 compile: compile,
-            };
+
+            }
         }]);
 }());
